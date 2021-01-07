@@ -10,3 +10,4 @@ Depends: Rsamtools, GenomicFeatures (>= 1.14.5), rtracklayer,
 biocViews: Sequencing, HighThroughputSequencing, Methylseq, RNAseq
 NeedsCompilation: no
 Packaged: 2016-1-10; biocbuild
+RoxygenNote: 7.1.1
