@@ -6,6 +6,8 @@ metpeak <- function(
   TXDB = NA,
   OUTPUT_DIR=NA,
   EXPERIMENT_NAME="MeTPeak_output",
+  PAIRED = FALSE,
+  STRANDED = "unstranded",
   WINDOW_WIDTH=50,
   SLIDING_STEP=50,
   FRAGMENT_LENGTH=100,
@@ -31,6 +33,8 @@ metpeak <- function(
   PARAMETERS$GENOME = GENOME
   PARAMETERS$UCSC_TABLE_NAME=UCSC_TABLE_NAME
   UCSC_TABLE_NAME = UCSC_TABLE_NAME
+  PARAMETERS$PAIRED = PAIRED
+  PARAMETERS$STRANDED = STRANDED
   PARAMETERS$FRAGMENT_LENGTH=FRAGMENT_LENGTH
   PARAMETERS$READ_LENGTH=READ_LENGTH
   PARAMETERS$WINDOW_WIDTH=WINDOW_WIDTH
@@ -54,6 +58,12 @@ metpeak <- function(
   if (is.na(PARAMETERS$GENOME) & is.na(PARAMETERS$GENE_ANNO_GTF)) { 
     stop("must specify the genome assembly or provide a gene gtf file for MeTPeak to work!", 
          call. = TRUE, domain = NULL)}
+  
+  # check stranded vs. unstranded
+  if(!PARAMETERS$STRANDED %in% c("unstranded", "forward", "reverse")){
+    stop("Invalid selection of library preparation. Please choose one of unstranded, forward or reverse.",
+         call. = TRUE, domain = NULL)
+  }
   
   # dependent variables
   if (is.na(PARAMETERS$READ_LENGTH)) {PARAMETERS$READ_LENGTH=.get.bam.read.length(PARAMETERS$IP_BAM[1])}
