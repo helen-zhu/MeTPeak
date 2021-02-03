@@ -10,13 +10,12 @@
 # get check point reads count
 .get.check.points.reads.count<- function(ibam,anno,bam,check_points,PARAMETERS){
   
+  # GENE
+  # print(paste0(anno$gene, "\n"))
   
   # RNA2DNA
   RNA2DNA = anno$left:anno$right
   RNA2DNA = RNA2DNA[anno$DNA2RNA > 0]
-  
-  # Introns
-  introns = GenomicRanges::GRanges(seqnames = anno$chr, IRanges::IRanges(which(anno$DNA2RNA == 0)+anno$left), strand = anno$strand)
   
   # Identifying GRanges
   .which = GenomicRanges::GRanges(seqnames = anno$chr, IRanges::IRanges(check_points, check_points), strand = anno$strand)
@@ -25,18 +24,20 @@
   end(.which) = RNA2DNA[end(.which)]
   start(.which) = ifelse(start(.which) < 0, 1, start(.which))
   start(.which) = RNA2DNA[start(.which)]
+  .which = S4Vectors::split(.which, 1:length(.which))
   
   # Removing Introns
-  .which = S4Vectors::split(.which, 1:length(.which))
-  split.vec = sort(rep(1:length(.which), length(introns)))
-  introns.rep = rep(introns, length(.which))
-  introns.rep = S4Vectors::split(introns.rep, split.vec)
-  
-  .which = GenomicRanges::setdiff(.which, introns.rep)
+  if(length(which(anno$DNA2RNA == 0)) > 0){
+    introns = GenomicRanges::GRanges(seqnames = anno$chr, IRanges::IRanges(which(anno$DNA2RNA == 0)+anno$left), strand = anno$strand)
+    split.vec = sort(rep(1:length(.which), length(introns)))
+    introns.rep = rep(introns, length(.which))
+    introns.rep = S4Vectors::split(introns.rep, split.vec)
+    .which = GenomicRanges::setdiff(.which, introns.rep)
+  }
   .which = unlist(.which)
   
   # Determining which strand to use
-  ID.strand = structure(c("+", "-"), names = c("-", "+")) 
+  ID.strand = structure(c("+", "-"), names = c("-", "+"))
   if(PARAMETERS$STRANDED == "forward"){
     ID.strand.m1 = anno$strand
     ID.strand.m2 = ID.strand[anno$strand]
